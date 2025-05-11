@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>RUET EEE Resource Search</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    input {
+      padding: 10px;
+      width: 100%;
+      max-width: 400px;
+      margin-bottom: 20px;
+    }
+    a {
+      color: blue;
+      text-decoration: none;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <h1>RUET EEE Resource Search</h1>
+  <input type="text" id="search" placeholder="Search (e.g., 'eee', 'playlist', 'power system')">
+  <div id="results"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/fuse.js"></script>
+  <script>
+    fetch('data.json')
+      .then(res => res.json())
+      .then(data => {
+        const fuse = new Fuse(data, {
+          keys: ['title', 'tags'],
+          threshold: 0.3
+        });
+
+        const searchInput = document.getElementById('search');
+        const resultsDiv = document.getElementById('results');
+
+        searchInput.addEventListener('input', () => {
+          const query = searchInput.value.trim();
+          const results = fuse.search(query);
+          resultsDiv.innerHTML = "";
+
+          if (results.length === 0 && query !== "") {
+            resultsDiv.innerHTML = "<p>No results found.</p>";
+          }
+
+          results.forEach(item => {
+            const link = document.createElement('a');
+            link.href = item.item.link;
+            link.target = "_blank";
+            link.textContent = item.item.title;
+
+            const para = document.createElement('p');
+            para.appendChild(link);
+            resultsDiv.appendChild(para);
+          });
+        });
+      });
+  </script>
+</body>
+</html>
